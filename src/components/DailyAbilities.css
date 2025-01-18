@@ -1,0 +1,65 @@
+.daily-abilities-page .title-container {
+  background-color: #531eff; /* Specific to Daily Abilities */
+  color: white;
+  text-align: center;
+  padding: 20px;
+  margin-bottom: 20px;
+  max-width: 1600px; /* Aligns with the #root container */
+  box-sizing: border-box; /* Ensures padding is included within the width */
+}
+
+.daily-abilities-page .title-heading {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.daily-abilities-page .title-description {
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+.daily-abilities-page .abilities-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.daily-abilities-page .ability-drop-zone {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #ffffff;
+  border: 2px solid #1e90ff;
+  border-radius: 10px;
+  padding: 15px;
+  height: 250px;
+  flex: 0 0 1360px; /* Takes full width and moves to a new row */
+}
+
+.daily-abilities-page .champion-box {
+  background-color: #ffffff;
+  border: 2px solid #1e90ff;
+  border-radius: 10px;
+  padding: 15px;
+  width: 300px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.daily-abilities-page .champion-box h3 {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+  color: #1e90ff;
+}
+
+.daily-abilities-page .champion-box ul {
+  list-style: none;
+  padding: 0;
+}
+
+.daily-abilities-page .champion-box li {
+  font-size: 1rem;
+  margin: 5px 0;
+  color: #333;
+}
+  
