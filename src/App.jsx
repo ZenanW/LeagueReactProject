@@ -14,9 +14,6 @@ function App() {
           <nav className="nav-links">
             <Link to="/">Home</Link>
             <Link to="/daily-abilities">Daily Ability Build</Link>
-            <a href="#news">News</a>
-            <a href="#community">Community</a>
-            <a href="#about">About</a>
           </nav>
         </header>
 

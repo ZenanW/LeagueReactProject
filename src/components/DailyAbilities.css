@@ -1,11 +1,12 @@
+/* Title Container Styling */
 .daily-abilities-page .title-container {
-  background-color: #531eff; /* Specific to Daily Abilities */
+  background-color: #531eff;
   color: white;
   text-align: center;
   padding: 20px;
   margin-bottom: 20px;
-  max-width: 1600px; /* Aligns with the #root container */
-  box-sizing: border-box; /* Ensures padding is included within the width */
+  max-width: 1600px;
+  box-sizing: border-box;
 }
 
 .daily-abilities-page .title-heading {
@@ -18,25 +19,18 @@
   margin-top: 10px;
 }
 
+/* Align Champion Boxes in a Row */
 .daily-abilities-page .abilities-container {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: flex-start;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.daily-abilities-page .ability-drop-zone {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-color: #ffffff;
-  border: 2px solid #1e90ff;
-  border-radius: 10px;
-  padding: 15px;
-  height: 250px;
-  flex: 0 0 1360px; /* Takes full width and moves to a new row */
-}
-
+/* Champion Box Styling */
 .daily-abilities-page .champion-box {
   background-color: #ffffff;
   border: 2px solid #1e90ff;
@@ -44,22 +38,94 @@
   padding: 15px;
   width: 300px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
+/* Champion Heading */
 .daily-abilities-page .champion-box h3 {
   margin: 0 0 10px;
   font-size: 1.5rem;
   color: #1e90ff;
 }
 
-.daily-abilities-page .champion-box ul {
-  list-style: none;
-  padding: 0;
+/* Champion Icon Styling */
+.daily-abilities-page .champion-icon {
+  display: block;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  border: 3px solid #1e90ff;
 }
 
-.daily-abilities-page .champion-box li {
-  font-size: 1rem;
-  margin: 5px 0;
-  color: #333;
+/* Abilities Container inside Champion Box */
+.daily-abilities-page .ability-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
 }
+
+/* Individual Ability Box */
+.daily-abilities-page .ability-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: grab;
+}
+
+/* Ability Image Styling */
+.daily-abilities-page .ability-box img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 5px;
+}
+
+/* Ability Label Styling */
+.daily-abilities-page .ability-label {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #1e90ff;
+  text-transform: uppercase;
+}
+
+/* Drop Zone Styling */
+.daily-abilities-page .ability-drop-zone {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  background-color: #ffffff;
+  border: 2px solid #1e90ff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+  height: 250px;
+  flex: 0 0 1360px;
+}
+
+/* Individual Dropped Ability Slot */
+.daily-abilities-page .ability-drop-zone div {
+  width: 80px;
+  height: 80px;
+  border: 2px dashed #1e90ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 95px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #888;
+  background-color: #f9f9f9;
+}
+
+/* Placeholder Text */
+.daily-abilities-page .drop-placeholder {
+  font-size: 1rem;
+  color: #aaa;
+}
+
+/* Dragging Effects */
+.daily-abilities-page .ability-box {
+  cursor: grab;
+}
+
+
   
