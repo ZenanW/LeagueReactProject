@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './DailyAbilities.css';
 import champions from "../data/champions"
 import axios from 'axios';
@@ -47,6 +48,9 @@ function DailyAbilities() {
     R: null,
   });
 
+  // React Router navigation hook
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       const selectedChampions = [];
@@ -74,6 +78,12 @@ function DailyAbilities() {
   if (!championData || championData.length < 4) {
     return <p>Loading...</p>;
   }
+
+  // Handle form submission
+  const handleSubmit = () => {
+    console.log("Navigating to stats page...");
+    navigate('/daily-abilities/stats');  // Navigate to the stats page
+  };
 
   // Handle drag start and pass ability data with its corresponding slot
   const handleDragStart = (event, ability, slot) => {
@@ -151,7 +161,7 @@ function DailyAbilities() {
             )}
           </div>
         ))}
-        <div className='submit'>
+        <div className='submit' onClick={handleSubmit} style={{ cursor: 'pointer' }}>
           <p>Lock In</p>
         </div>
       </div>
@@ -160,4 +170,5 @@ function DailyAbilities() {
 }
 
 export default DailyAbilities;
+
 

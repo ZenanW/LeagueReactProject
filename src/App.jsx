@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './index.css';
 import './App.css';
 import DailyAbilities from './components/DailyAbilities';
+import ChoiceStats from './components/ChoiceStats';  // Import the ChoiceStats component
 
 function App() {
   return (
@@ -36,6 +37,9 @@ function App() {
 
           {/* Daily Abilities Route */}
           <Route path="/daily-abilities" element={<DailyAbilities />} />
+          
+          {/* Choice Stats Route */}
+          <Route path="/daily-abilities/stats" element={<ChoiceStats />} />
         </Routes>
       </div>
     </Router>
