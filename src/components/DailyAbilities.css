@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Friz+Quadrata+Std:wght@700&display=swap'); /* Friz Quadrata alternative */
+
 /* Title Container Styling */
 .daily-abilities-page .title-container {
   background-color: #531eff;
@@ -92,6 +94,8 @@
   display: flex;
   gap: 20px;
   justify-content: center;
+  align-items: center;  
+  flex-wrap: wrap;       
   background-color: #ffffff;
   border: 2px solid #1e90ff;
   border-radius: 10px;
@@ -102,14 +106,14 @@
 }
 
 /* Individual Dropped Ability Slot */
-.daily-abilities-page .ability-drop-zone div {
+.daily-abilities-page .ability-drop-zone div:not(.submit) {
   width: 80px;
   height: 80px;
   border: 2px dashed #1e90ff;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 95px;
+  margin: auto;
   font-size: 1rem;
   font-weight: bold;
   color: #888;
@@ -125,6 +129,44 @@
 /* Dragging Effects */
 .daily-abilities-page .ability-box {
   cursor: grab;
+}
+
+.ability-drop-zone .submit {
+  display: flex;
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+  height: auto; /* Allow flexibility for different screen sizes */
+  min-height: 80px; /* Minimum height to maintain visibility */
+  width: auto; /* Allow button width to adjust based on content */
+  min-width: 150px; /* Ensure proper width for text */
+  padding: 20px 40px; /* Adjust padding for better appearance */
+  border-radius: 15px;
+  margin: auto;
+  background: linear-gradient(180deg, #14dbf5 0%, #0798bc 100%);
+  border: 2px solid #0044ff;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ability-drop-zone .submit:hover {
+  background: linear-gradient(180deg, #0798bc 0%, #14dbf5 100%);
+  border-color: #1e90ff;
+  transform: scale(1.05);
+}
+
+.ability-drop-zone .submit:active {
+  transform: scale(0.95);
+}
+
+.ability-drop-zone .submit p {
+  font-family: 'Friz Quadrata Std', sans-serif; /* League of Legends font alternative */
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+  letter-spacing: 1px;
+  margin: 0;
 }
 
 

@@ -151,6 +151,9 @@ function DailyAbilities() {
             )}
           </div>
         ))}
+        <div className='submit'>
+          <p>Lock In</p>
+        </div>
       </div>
     </section>
   );
