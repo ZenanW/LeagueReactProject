@@ -6,38 +6,32 @@ import axios from 'axios';
 
 const fetchChampionData = async (randomChampion) => {
   const patch = '13.20.1'; // Replace with the latest patch
-  const baseURL = `https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/champion.json`;
+  const championDetailURL = `https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/champion/${randomChampion}.json`;
 
   try {
-    // Fetch all champions
-    const response = await axios.get(baseURL);
-    const champions = response.data.data;
-
-    // Example: Get detailed data for a specific champion (e.g., Aatrox)
-    const championName = randomChampion; // Replace with desired champion name
-    const championDetailURL = `https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/champion/${championName}.json`;
-
-    const championDetailResponse = await axios.get(championDetailURL);
-    const championDetails = championDetailResponse.data.data[championName];
+    const response = await axios.get(championDetailURL);
+    const championDetails = response.data.data[randomChampion];
 
     // Get champion icon URL
-    const championIconURL = `https://ddragon.leagueoflegends.com/cdn/${patch}/img/champion/${championName}.png`;
+    const championIconURL = `https://ddragon.leagueoflegends.com/cdn/${patch}/img/champion/${randomChampion}.png`;
 
-    // Get ability icons
-    const abilityIcons = championDetails.spells.map(
-      (spell) => `https://ddragon.leagueoflegends.com/cdn/${patch}/img/spell/${spell.image.full}`
-    );
+    // Get ability names and icons
+    const abilities = championDetails.spells.map((spell) => ({
+      name: spell.name, // Ability name (e.g., "Dark Flight")
+      icon: `https://ddragon.leagueoflegends.com/cdn/${patch}/img/spell/${spell.image.full}`, // Ability icon URL
+    }));
 
     return {
+      championName: randomChampion,
       championIcon: championIconURL,
-      abilityIcons,
+      abilities, // Array of abilities with names and icons
     };
 
   } catch (error) {
     console.error('Error fetching champion data:', error);
+    return null;
   }
 };
-
 
 function DailyAbilities() {
   const [championData, setChampionData] = useState([]);
@@ -80,15 +74,36 @@ function DailyAbilities() {
   }
 
   // Handle form submission
-  const handleSubmit = () => {
-    console.log("Navigating to stats page...");
-    navigate('/daily-abilities/stats');  // Navigate to the stats page
+  const handleSubmit = async () => {
+    console.log("Submitting abilities:", droppedAbilities); // Debug log
+
+    try {
+        const response = await axios.post('http://localhost:5000/api/abilities', {
+            abilities: droppedAbilities 
+        });
+
+        if (response.status === 201) {
+            console.log("Abilities successfully stored:", response.data);
+            navigate('/daily-abilities/stats', { state: { abilities: droppedAbilities } });
+        }
+    } catch (error) {
+        console.error("Error submitting abilities:", error);
+    }
   };
 
   // Handle drag start and pass ability data with its corresponding slot
-  const handleDragStart = (event, ability, slot) => {
-    event.dataTransfer.setData('ability', JSON.stringify({ ability, slot }));
+  const handleDragStart = (event, ability, slot, champion) => {
+    event.dataTransfer.setData(
+      'ability',
+      JSON.stringify({ 
+        abilityName: ability.name, // Store ability name
+        abilityIcon: ability.icon, // Store ability icon
+        slot: slot, 
+        champion: champion // Store champion name
+      })
+    );
   };
+  
 
   // Handle drop event with validation
   const handleDrop = (event, slot) => {
@@ -97,15 +112,20 @@ function DailyAbilities() {
 
     // Check if the dropped ability matches the intended slot
     if (data.slot === slot) {
-      setDroppedAbilities((prev) => ({
-        ...prev,
-        [slot]: data.ability,
-      }));
+        setDroppedAbilities((prev) => ({
+            ...prev,
+            [slot]: { // ✅ Store the ability as an object containing both the name and champion
+                abilityName: data.abilityName, 
+                champion: data.champion,
+                abilityIcon: data.abilityIcon // Optional, if needed for frontend display
+            }
+        }));
     } else {
-      alert(`You can only drop the ${data.slot} ability into the ${data.slot} slot.`);
+        alert(`You can only drop the ${data.slot} ability into the ${data.slot} slot.`);
     }
   };
 
+  
   // Allow drag over event to enable dropping
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -134,11 +154,10 @@ function DailyAbilities() {
                 <div
                   key={idx}
                   className="ability-box"
-                  draggable
-                  onDragStart={(event) => handleDragStart(event, champion.abilityIcons[idx], label)}
+                  draggable="true"
+                  onDragStart={(event) => handleDragStart(event, champion.abilities[idx], label, champion.championName)}
                 >
-                  <img src={champion.abilityIcons[idx]} alt={`Ability ${label}`} />
-                  <span className="ability-label">{label}</span>
+                  <img src={champion.abilities[idx].icon} alt={`Ability ${label}`} />
                 </div>
               ))}
             </div>
@@ -155,7 +174,7 @@ function DailyAbilities() {
             onDragOver={handleDragOver}
           >
             {droppedAbilities[slot] ? (
-              <img src={droppedAbilities[slot]} alt={`Dropped ${slot}`} width="50" />
+              <img src={droppedAbilities[slot].abilityIcon} alt={`Dropped ${slot}`} width="50" />
             ) : (
               <span className="drop-placeholder">Drop {slot} here</span>
             )}

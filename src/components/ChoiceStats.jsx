@@ -1,12 +1,79 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import './ChoiceStats.css';
+
+// Register Chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function ChoiceStats() {
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Retrieve user's selected abilities from navigation state
+  const userAbilities = location.state?.abilities || {
+    Q: "Not Selected",
+    W: "Not Selected",
+    E: "Not Selected",
+    R: "Not Selected",
+  };
+
+  // State to store community ability stats
+  const [communityStats, setCommunityStats] = useState([]);
+
+  // Fetch community choices from the backend
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/abilities/stats')
+      .then(response => {
+        console.log("API Response:", response.data);  // Debugging
+        
+        if (!response.data.mostChosenCombinations || response.data.mostChosenCombinations.length === 0) {
+          console.warn("No data received from API.");
+        }
+  
+        setCommunityStats(response.data.mostChosenCombinations || []);
+      })
+      .catch(error => {
+        console.error('Error fetching community abilities:', error.response ? error.response.data : error.message);
+      });
+}, []);
+  
   const goBack = () => {
     navigate('/daily-abilities');
+  };
+
+  // Prepare data for the chart
+  const chartData = {
+    labels: communityStats.map((combo, index) => `Build ${index + 1}`),
+    datasets: [
+      {
+        label: 'Frequency of Ability Combination',
+        data: communityStats.map(combo => combo.frequency), // 🚨 Ensure `frequency` is a number
+        backgroundColor: 'rgba(255, 204, 0, 0.7)',
+        borderColor: 'rgba(255, 204, 0, 1)',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: 'Top 10 Most Picked Ability Builds',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
   };
 
   return (
@@ -18,29 +85,23 @@ function ChoiceStats() {
         </p>
 
         <div className="stats-box">
-          <div className="stat-item">
-            <h3>Q Ability</h3>
-            <p className="stat-value">Your Pick: <span>Ability 1</span></p>
-            <p className="stat-value">Community Pick: <span>Ability 2</span></p>
-          </div>
+          {["Q", "W", "E", "R"].map((ability) => (
+            <div key={ability} className="stat-item">
+              <h3>{ability} Ability</h3>
+              <p className="stat-value">
+                Your Pick: 
+                <span>
+                  {userAbilities[ability]?.abilityName || "Not Selected"} 
+                  ({userAbilities[ability]?.champion || "Unknown Champion"})
+                </span>
+              </p>
+            </div>
+          ))}
+        </div>
 
-          <div className="stat-item">
-            <h3>W Ability</h3>
-            <p className="stat-value">Your Pick: <span>Ability 3</span></p>
-            <p className="stat-value">Community Pick: <span>Ability 3</span></p>
-          </div>
-
-          <div className="stat-item">
-            <h3>E Ability</h3>
-            <p className="stat-value">Your Pick: <span>Ability 2</span></p>
-            <p className="stat-value">Community Pick: <span>Ability 1</span></p>
-          </div>
-
-          <div className="stat-item">
-            <h3>R Ability</h3>
-            <p className="stat-value">Your Pick: <span>Ability 4</span></p>
-            <p className="stat-value">Community Pick: <span>Ability 4</span></p>
-          </div>
+        {/* Bar Chart for Ability Combinations */}
+        <div className="chart-container">
+          <Bar data={chartData} options={chartOptions} />
         </div>
 
         <button className="back-button" onClick={goBack}>Back to Selection</button>
@@ -50,3 +111,5 @@ function ChoiceStats() {
 }
 
 export default ChoiceStats;
+
+

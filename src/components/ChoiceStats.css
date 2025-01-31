@@ -81,4 +81,10 @@
   .back-button:hover {
     background-color: #e6b800;
   }
+
+  .chart-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+  }
   
