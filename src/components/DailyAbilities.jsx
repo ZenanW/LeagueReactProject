@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DailyAbilities.css';
-import champions from "../data/champions"
 import axios from 'axios';
 
-const fetchChampionData = async (randomChampion) => {
-  const patch = '13.20.1'; // Replace with the latest patch
-  const championDetailURL = `https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/champion/${randomChampion}.json`;
+const patch = '14.24.1'; // Update this to the latest patch
+
+// Function to fetch ability data from Riot API
+const fetchChampionData = async (championName) => {
+  const championDetailURL = `https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/champion/${championName}.json`;
 
   try {
     const response = await axios.get(championDetailURL);
-    const championDetails = response.data.data[randomChampion];
+    const championDetails = response.data.data[championName];
 
     // Get champion icon URL
-    const championIconURL = `https://ddragon.leagueoflegends.com/cdn/${patch}/img/champion/${randomChampion}.png`;
+    const championIconURL = `https://ddragon.leagueoflegends.com/cdn/${patch}/img/champion/${championName}.png`;
 
     // Get ability names and icons
     const abilities = championDetails.spells.map((spell) => ({
@@ -22,11 +23,10 @@ const fetchChampionData = async (randomChampion) => {
     }));
 
     return {
-      championName: randomChampion,
+      championName,
       championIcon: championIconURL,
       abilities, // Array of abilities with names and icons
     };
-
   } catch (error) {
     console.error('Error fetching champion data:', error);
     return null;
@@ -42,28 +42,27 @@ function DailyAbilities() {
     R: null,
   });
 
-  // React Router navigation hook
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      const selectedChampions = [];
-      while (selectedChampions.length < 4) {
-        const randomIndex = Math.floor(Math.random() * champions.length);
-        const randomChampion = champions[randomIndex];
-        if (!selectedChampions.includes(randomChampion)) {
-          selectedChampions.push(randomChampion);
-        }
+      try {
+        // 🔹 Fetch 5 champions from your backend
+        const response = await axios.get('http://localhost:5000/api/daily-champions');
+        const selectedChampions = response.data.champions; // List of 5 champion names
+
+        console.log(`Fetching data for: ${selectedChampions}`);
+
+        // 🔹 Fetch ability data for each champion from Riot API
+        const championDataPromises = selectedChampions.map((champion) =>
+          fetchChampionData(champion)
+        );
+
+        const data = await Promise.all(championDataPromises);
+        setChampionData(data.filter(Boolean)); // Remove null values if API calls fail
+      } catch (error) {
+        console.error('Error fetching daily champions:', error);
       }
-
-      console.log(`Fetching data for: ${selectedChampions}`);
-
-      const championDataPromises = selectedChampions.map((champion) =>
-        fetchChampionData(champion)
-      );
-
-      const data = await Promise.all(championDataPromises);
-      setChampionData(data);
     };
 
     fetchData();
@@ -78,16 +77,16 @@ function DailyAbilities() {
     console.log("Submitting abilities:", droppedAbilities); // Debug log
 
     try {
-        const response = await axios.post('http://localhost:5000/api/abilities', {
-            abilities: droppedAbilities 
-        });
+      const response = await axios.post('http://localhost:5000/api/abilities', {
+        abilities: droppedAbilities 
+      });
 
-        if (response.status === 201) {
-            console.log("Abilities successfully stored:", response.data);
-            navigate('/daily-abilities/stats', { state: { abilities: droppedAbilities } });
-        }
+      if (response.status === 201) {
+        console.log("Abilities successfully stored:", response.data);
+        navigate('/daily-abilities/stats', { state: { abilities: droppedAbilities } });
+      }
     } catch (error) {
-        console.error("Error submitting abilities:", error);
+      console.error("Error submitting abilities:", error);
     }
   };
 
@@ -103,7 +102,6 @@ function DailyAbilities() {
       })
     );
   };
-  
 
   // Handle drop event with validation
   const handleDrop = (event, slot) => {
@@ -112,20 +110,19 @@ function DailyAbilities() {
 
     // Check if the dropped ability matches the intended slot
     if (data.slot === slot) {
-        setDroppedAbilities((prev) => ({
-            ...prev,
-            [slot]: { // ✅ Store the ability as an object containing both the name and champion
-                abilityName: data.abilityName, 
-                champion: data.champion,
-                abilityIcon: data.abilityIcon // Optional, if needed for frontend display
-            }
-        }));
+      setDroppedAbilities((prev) => ({
+        ...prev,
+        [slot]: { // ✅ Store the ability as an object containing both the name and champion
+          abilityName: data.abilityName, 
+          champion: data.champion,
+          abilityIcon: data.abilityIcon // Optional, if needed for frontend display
+        }
+      }));
     } else {
-        alert(`You can only drop the ${data.slot} ability into the ${data.slot} slot.`);
+      alert(`You can only drop the ${data.slot} ability into the ${data.slot} slot.`);
     }
   };
 
-  
   // Allow drag over event to enable dropping
   const handleDragOver = (event) => {
     event.preventDefault();

@@ -14,43 +14,60 @@ function ChoiceStats() {
 
   // Retrieve user's selected abilities from navigation state
   const userAbilities = location.state?.abilities || {
-    Q: "Not Selected",
-    W: "Not Selected",
-    E: "Not Selected",
-    R: "Not Selected",
+    Q: { abilityName: "Not Selected", champion: "Unknown Champion" },
+    W: { abilityName: "Not Selected", champion: "Unknown Champion" },
+    E: { abilityName: "Not Selected", champion: "Unknown Champion" },
+    R: { abilityName: "Not Selected", champion: "Unknown Champion" },
   };
 
   // State to store community ability stats
-  const [communityStats, setCommunityStats] = useState([]);
+  const [communityStats, setCommunityStats] = useState({
+    Q: { ability: "Loading...", champion: "Loading...", frequency: 0 },
+    W: { ability: "Loading...", champion: "Loading...", frequency: 0 },
+    E: { ability: "Loading...", champion: "Loading...", frequency: 0 },
+    R: { ability: "Loading...", champion: "Loading...", frequency: 0 },
+  });
 
   // Fetch community choices from the backend
   useEffect(() => {
     axios.get('http://localhost:5000/api/abilities/stats')
       .then(response => {
-        console.log("API Response:", response.data);  // Debugging
+        console.log("API Response:", response.data); // Debugging
         
-        if (!response.data.mostChosenCombinations || response.data.mostChosenCombinations.length === 0) {
+        if (!response.data.mostChosenAbilities || response.data.mostChosenAbilities.length === 0) {
           console.warn("No data received from API.");
+          return;
         }
-  
-        setCommunityStats(response.data.mostChosenCombinations || []);
+
+        // Convert array to an object for easy access
+        const statsObj = response.data.mostChosenAbilities.reduce((acc, entry) => {
+          acc[entry.slot] = entry;
+          return acc;
+        }, {});
+
+        setCommunityStats(statsObj);
       })
       .catch(error => {
         console.error('Error fetching community abilities:', error.response ? error.response.data : error.message);
       });
-}, []);
-  
+  }, []);
+
   const goBack = () => {
     navigate('/daily-abilities');
   };
 
   // Prepare data for the chart
   const chartData = {
-    labels: communityStats.map((combo, index) => `Build ${index + 1}`),
+    labels: ['Q Ability', 'W Ability', 'E Ability', 'R Ability'],
     datasets: [
       {
-        label: 'Frequency of Ability Combination',
-        data: communityStats.map(combo => combo.frequency), // 🚨 Ensure `frequency` is a number
+        label: 'Most Chosen by Community',
+        data: [
+          communityStats.Q.frequency,
+          communityStats.W.frequency,
+          communityStats.E.frequency,
+          communityStats.R.frequency
+        ],
         backgroundColor: 'rgba(255, 204, 0, 0.7)',
         borderColor: 'rgba(255, 204, 0, 1)',
         borderWidth: 1,
@@ -66,7 +83,7 @@ function ChoiceStats() {
       },
       title: {
         display: true,
-        text: 'Top 10 Most Picked Ability Builds',
+        text: 'Most Picked Ability per Slot',
       },
     },
     scales: {
@@ -79,27 +96,26 @@ function ChoiceStats() {
   return (
     <section className="choice-stats-page">
       <div className="stats-container">
-        <h2 className="stats-heading">Your Ability Choices</h2>
+        <h2 className="stats-heading">Your Ability Choices vs. Community</h2>
         <p className="stats-description">
-          Here's a summary of your ability selections compared to the community picks.
+          Compare your ability selections to the most chosen abilities by the community.
         </p>
 
         <div className="stats-box">
-          {["Q", "W", "E", "R"].map((ability) => (
-            <div key={ability} className="stat-item">
-              <h3>{ability} Ability</h3>
+          {["Q", "W", "E", "R"].map((slot) => (
+            <div key={slot} className="stat-item">
+              <h3>{slot} Ability</h3>
               <p className="stat-value">
-                Your Pick: 
-                <span>
-                  {userAbilities[ability]?.abilityName || "Not Selected"} 
-                  ({userAbilities[ability]?.champion || "Unknown Champion"})
-                </span>
+                <strong>Your Pick:</strong> {userAbilities[slot]?.abilityName || "Not Selected"} ({userAbilities[slot]?.champion || "Unknown"})
+              </p>
+              <p className="stat-value">
+                <strong>Most Chosen:</strong> {communityStats[slot]?.ability} ({communityStats[slot]?.champion}) - {communityStats[slot]?.frequency} picks
               </p>
             </div>
           ))}
         </div>
 
-        {/* Bar Chart for Ability Combinations */}
+        {/* Bar Chart for Community Stats */}
         <div className="chart-container">
           <Bar data={chartData} options={chartOptions} />
         </div>
@@ -111,5 +127,6 @@ function ChoiceStats() {
 }
 
 export default ChoiceStats;
+
 
 
