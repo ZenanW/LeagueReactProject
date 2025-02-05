@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './index.css';
 import './App.css';
 import DailyAbilities from './components/DailyAbilities';
-import ChoiceStats from './components/ChoiceStats';  // Import the ChoiceStats component
+import ChoiceStats from './components/ChoiceStats';  
+import ItemMiniGame from './components/ItemMiniGame';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <nav className="nav-links">
             <Link to="/">Home</Link>
             <Link to="/daily-abilities">Daily Ability Build</Link>
+            <Link to="/Item-Minigame">Item Mini Game</Link>
           </nav>
         </header>
 
@@ -40,6 +42,10 @@ function App() {
           
           {/* Choice Stats Route */}
           <Route path="/daily-abilities/stats" element={<ChoiceStats />} />
+
+          {/* Item Minigame Route*/}
+          <Route path="/Item-Minigame" element={<ItemMiniGame />} />
+
         </Routes>
       </div>
     </Router>

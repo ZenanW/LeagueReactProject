@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Friz+Quadrata+Std:wght@700&display=swap'); /* Friz Quadrata alternative */
+h1 {
+    font-family: 'Friz Quadrata Std', sans-serif;
+    color: #d1a3ff;
+}
+
+.item-mini-game .page-container{
+    display: flex;
+    flex-direction: column;
+    height: 110vh;
+    width: 1200px;
+    background: linear-gradient(180deg, #1a1326 0%, #251a33 100%);
+    align-items: center;
+}
+
