@@ -16,7 +16,7 @@ function App() {
           <nav className="nav-links">
             <Link to="/">Home</Link>
             <Link to="/daily-abilities">Daily Ability Build</Link>
-            <Link to="/Item-Minigame">Item Mini Game</Link>
+            <Link to="/item-minigame">Item Mini Game</Link>
           </nav>
         </header>
 
@@ -44,7 +44,7 @@ function App() {
           <Route path="/daily-abilities/stats" element={<ChoiceStats />} />
 
           {/* Item Minigame Route*/}
-          <Route path="/Item-Minigame" element={<ItemMiniGame />} />
+          <Route path="/item-minigame" element={<ItemMiniGame />} />
 
         </Routes>
       </div>
