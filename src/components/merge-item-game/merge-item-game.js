@@ -1,51 +1,73 @@
-import kaboom from "kaboom";
-
-let kaboomInstance = null; // Global variable to track instanc
+import Phaser from "phaser";
 
 export function startGame(container) {
-    if (!container) return;
+    if (!container) return; // Ensure container exists before mounting Phaser
 
-    if (kaboomInstance) {
-        console.warn("Kaboom instance already exists. Skipping new instance.");
-        return; // Prevent duplicate game instances
+    // If there's already a Phaser game, don't create a new one
+    if (container.phaserGame) {
+        console.warn("Phaser game already exists. Skipping new instance.");
+        return;
     }
 
-    kaboomInstance = kaboom({
-        global: false,
+    const config = {
+        type: Phaser.AUTO,
         width: 600,
         height: 720,
-        root: container,
+        parent: container, // Attach Phaser to the React JSX div
+        physics: {
+            default: "matter", // Uses Matter.js for physics
+            matter: {
+                gravity: { y: 1 }, // Enables physics gravity
+                // debug: true, // Show hitboxes for debugging
+            },
+        },
+        scene: {
+            preload: preload,
+            create: create,
+            update: update,
+        },
+    };
+
+    // Store Phaser game instance in the container (so we don't re-create it)
+    container.phaserGame = new Phaser.Game(config);
+}
+
+let long_sword;
+let ground;
+const bounceFactor = 0.6; // Energy lost per bounce
+
+function preload() {
+    this.load.image("background", "/assets/game-background.png");
+    this.load.image("long_sword", "/assets/AD_items/Long_Sword.png");
+}
+
+function create() {
+    // Add background
+    this.add.image(300, 360, "background").setScale(0.75);
+
+    this.matter.world.setBounds(0, 0, 600, 720);
+
+    // Add long_sword as a **true circular physics object**
+    long_sword = this.matter.add.image(300, 200, "long_sword", null, {
+        shape: "circle", // Circular hitbox
+        restitution: bounceFactor, // Controls bounciness
+        density: 0.001, // Light object
+        friction: 0.98, // Slows down horizontal movement
     });
 
-    kaboomInstance.setGravity(2400);
+    long_sword.setScale(0.8); // Adjust size if needed
+    long_sword.setBounce(bounceFactor)
 
-    kaboomInstance.loadSprite("background", "/assets/game-background.png");
-    
-    kaboomInstance.add([
-        kaboomInstance.sprite("background"), // Set as background
-        kaboomInstance.pos(-115, 0), // Position it at the top-left
-        kaboomInstance.scale(0.75), // Adjust size if needed
-    ]);
+    // Make it jump when pressing space
+    this.input.keyboard.on("keydown-SPACE", () => {
+        long_sword.setVelocityY(-10); // Apply upward force
+    });
+}
 
-    kaboomInstance.loadSprite("draven", "/assets/draven_head.png");
-
-    const ground = kaboomInstance.add([ 
-        kaboomInstance.rect(600, 50), //  Full-width platform
-        kaboomInstance.pos(0, 720),   //  Position at bottom
-        kaboomInstance.color(100, 100, 100), // Gray color
-        kaboomInstance.area(), //  Enables collision detection
-        kaboomInstance.body({ isStatic: true }), //  Make it static so it doesn't fall
-    ]);
-
-    const draven = kaboomInstance.add([
-        kaboomInstance.sprite("draven"), //  Correct way
-        kaboomInstance.pos(80, 40),
-        kaboomInstance.area(),
-        kaboomInstance.body(),
-    ]);
-
-    kaboomInstance.onKeyPress("space", () => {
-        // this method is provided by the "body" component above
-        draven.jump()
-    })
+function update() {
+    // Ensures the object stays within bounds (optional)
+    if (long_sword.y > 800) {
+        long_sword.setPosition(300, 200); // Reset position if it falls off
+        long_sword.setVelocity(0, 0);
+    }
 }
