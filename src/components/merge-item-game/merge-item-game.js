@@ -110,7 +110,7 @@ function update() {
     }
 }
 
-// Generates a new item when needed
+//  Generates a new item when needed
 function generateNewItem(scene) {
     let newItem = scene.matter.add.image(300, 200, "long_sword", null, {
         shape: "circle",
