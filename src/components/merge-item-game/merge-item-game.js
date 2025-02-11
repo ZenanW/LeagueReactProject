@@ -17,7 +17,7 @@ export function startGame(container) {
             default: "matter",
             matter: {
                 gravity: { y: 1 },
-                debug: true, // Show hitboxes for debugging
+                // debug: true, // Show hitboxes for debugging
             },
         },
         scene: {
@@ -37,6 +37,12 @@ let items = []; // Stores all items
 function preload() {
     this.load.image("background", "/assets/game-background.png");
     this.load.image("long_sword", "/assets/AD_items/Long_Sword-modified.png");
+    this.load.image("pickaxe", "/assets/AD_items/Pickaxe-modified.png");
+    this.load.image("caulfields_hammer", "/assets/AD_items/Caulfield_s_Warhammer-modified.png");
+    this.load.image("BF_sword", "/assets/AD_items/B_F_Sword-modified.png");
+    this.load.image("Youmuus_Ghostblade", "/assets/AD_items/Youmuu_s_Ghostblade-modified.png");
+    this.load.image("Voltaic_Cyclosword", "/assets/AD_items/Voltaic_Cyclosword-modified.png");
+    this.load.image("I.E", "/assets/AD_items/Edge_of_Finality-modified.png");
 }
 
 function create() {
@@ -54,16 +60,18 @@ function create() {
         drop: Phaser.Input.Keyboard.KeyCodes.SPACE
     });
 
-    // Drop the latest item when SPACE is pressed
+    // Drop the generated item when SPACE is pressed
     this.input.keyboard.on("keydown-SPACE", () => {
-        if (!isDropped && items.length > 0) {
-            let latestItem = items[items.length - 1];
-            latestItem.setStatic(false); // Enable physics
-            isDropped = true; // Mark as dropped
+        let generatedItem = items.find(item => item.isGenerated); // Get the currently controllable item
+        if (generatedItem && generatedItem.body.isStatic) {
+            generatedItem.setStatic(false); // Enable physics
+            generatedItem.isGenerated = false; // It's now a regular object
+            isDropped = true; // Track that an item has been dropped
+            lastDroppedItem = generatedItem; // Track it for landing detection
         }
     });
 
-    // Collision detection: Runs continuously
+    // Collision detection
     this.matter.world.on("collisionstart", (event) => {
         event.pairs.forEach((pair) => {
             let bodyA = pair.bodyA;
@@ -72,43 +80,43 @@ function create() {
             let itemA = items.find((item) => item.body === bodyA);
             let itemB = items.find((item) => item.body === bodyB);
 
-            // If two different items collide, trigger a merge or spawn
             if (itemA && itemB && itemA !== itemB) {
-                if (!itemA.hasSpawnedNext && !itemB.hasSpawnedNext) {
-                    console.log("Item collision detected!");
-                    itemA.hasSpawnedNext = true;
-                    itemB.hasSpawnedNext = true;
-                    generateNewItem(this);
+                if (itemA.texture.key === "long_sword" && itemB.texture.key === "long_sword") {
+                    mergeItems(this, itemA, itemB, "pickaxe");
+                } else if (itemA.texture.key === "pickaxe" && itemB.texture.key === "pickaxe") {
+                    mergeItems(this, itemA, itemB, "caulfields_hammer");
                 }
             }
         });
     });
 }
 
-function update() {
-    let latestItem = items[items.length - 1];
+let lastDroppedItem = null; // Track the last dropped item separately
 
-    // Move latest item before dropping
-    if (!isDropped && latestItem) {
-        if (this.cursors.left.isDown && latestItem.x > 25) {
-            latestItem.x -= 5;
-        } else if (this.cursors.right.isDown && latestItem.x < 575) {
-            latestItem.x += 5;
+function update() {
+    let generatedItem = items.find(item => item.isGenerated); // Find the controllable item
+
+    // Move only the generated item before dropping
+    if (generatedItem) {
+        if (this.cursors.left.isDown && generatedItem.x > 25) {
+            generatedItem.x -= 5;
+        } else if (this.cursors.right.isDown && generatedItem.x < 575) {
+            generatedItem.x += 5;
         }
     }
 
-    // Check if last dropped item has landed and generate a new one
-    if (
-        isDropped &&
-        latestItem &&
-        latestItem.body.velocity.y < 0.1 &&
-        !latestItem.hasSpawnedNext
-    ) {
-        latestItem.hasSpawnedNext = true; // Prevent multiple spawns
-        console.log("Item landed. Generating new item...");
-        setTimeout(() => generateNewItem(this), 300); // Small delay to avoid instant spawns
+    // Track the last dropped item separately
+    if (!generatedItem && isDropped && lastDroppedItem) {
+        if (lastDroppedItem.body.velocity.y < 0.1 && !lastDroppedItem.hasSpawnedNext) {
+            lastDroppedItem.hasSpawnedNext = true; // Prevent multiple spawns
+            console.log("Item landed. Generating new item...");
+            this.time.delayedCall(1000, () => {
+                generateNewItem(this);
+            });
+        }
     }
 }
+
 
 //  Generates a new item when needed
 function generateNewItem(scene) {
@@ -118,17 +126,58 @@ function generateNewItem(scene) {
         density: 0.001,
         friction: 0.98,
         collisionFilter: {
-            category: 0x0001,  // Assign category for all items
-            mask: 0x0001       // Allow items to collide with each other
+            category: 0x0001,
+            mask: 0x0001
         }
     });
 
-    newItem.setScale(0.8);
-    newItem.setStatic(true); // Not dropped initially
-    newItem.hasSpawnedNext = false; // Reset spawn state for each new item
-    isDropped = false; // Reset drop state
+    newItem.setScale(0.9);
+    newItem.setStatic(true); // Start as static, waiting for player to drop
+    newItem.hasSpawnedNext = false;
+    newItem.isGenerated = true; // Mark it as a generated item
+    newItem.formFromCollision = false; // Not from merging
 
     items.push(newItem); // Store in items array
+
+    isDropped = false; // Reset drop state
+    lastDroppedItem = null; // Reset last dropped item tracker
+}
+
+function mergeItems(scene, itemA, itemB, newTexture) {
+    // Find the midpoint of the two items
+    let newX = (itemA.x + itemB.x) / 2;
+    let newY = (itemA.y + itemB.y) / 2;
+
+    // Remove old items
+    scene.matter.world.remove(itemA);
+    scene.matter.world.remove(itemB);
+
+    itemA.destroy();
+    itemB.destroy();
+
+    items = items.filter(item => item !== itemA && item !== itemB);
+
+    // Create the new merged item
+    let newItem = scene.matter.add.image(newX, newY, newTexture, null, {
+        shape: "circle",
+        restitution: bounceFactor,
+        density: 0.001,
+        friction: 0.98,
+        collisionFilter: {
+            category: 0x0001,
+            mask: 0x0001
+        }
+    });
+
+    if (newTexture == "pickaxe") {
+        newItem.setScale(1.4);
+    } else if (newTexture == "caulfields_hammer") {
+        newItem.setScale(1.8);
+    }
+    
+    newItem.formFromCollision = true;
+    newItem.setStatic(false); // Allow it to fall
+    items.push(newItem); // Store in items array 
 }
 
 
