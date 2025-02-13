@@ -85,6 +85,14 @@ function create() {
                     mergeItems(this, itemA, itemB, "pickaxe");
                 } else if (itemA.texture.key === "pickaxe" && itemB.texture.key === "pickaxe") {
                     mergeItems(this, itemA, itemB, "caulfields_hammer");
+                } else if (itemA.texture.key === "caulfields_hammer" && itemB.texture.key === "caulfields_hammer") {
+                    mergeItems(this, itemA, itemB, "BF_sword");
+                } else if (itemA.texture.key === "BF_sword" && itemB.texture.key === "BF_sword") {
+                    mergeItems(this, itemA, itemB, "Youmuus_Ghostblade");
+                } else if (itemA.texture.key === "Youmuus_Ghostblade" && itemB.texture.key === "Youmuus_Ghostblade") {
+                    mergeItems(this, itemA, itemB, "Voltaic_Cyclosword");
+                } else if (itemA.texture.key === "Voltaic_Cyclosword" && itemB.texture.key === "Voltaic_Cyclosword") {
+                    mergeItems(this, itemA, itemB, "I.E");
                 }
             }
         });
@@ -107,7 +115,7 @@ function update() {
 
     // Track the last dropped item separately
     if (!generatedItem && isDropped && lastDroppedItem) {
-        if (lastDroppedItem.body.velocity.y < 0.1 && !lastDroppedItem.hasSpawnedNext) {
+        if (!lastDroppedItem.hasSpawnedNext) {
             lastDroppedItem.hasSpawnedNext = true; // Prevent multiple spawns
             console.log("Item landed. Generating new item...");
             this.time.delayedCall(1000, () => {
@@ -173,8 +181,15 @@ function mergeItems(scene, itemA, itemB, newTexture) {
         newItem.setScale(1.4);
     } else if (newTexture == "caulfields_hammer") {
         newItem.setScale(1.8);
+    } else if (newTexture == "BF_sword") {
+        newItem.setScale(2.2);
+    } else if (newTexture == "Youmuus_Ghostblade") {
+        newItem.setScale(2.6);
+    } else if (newTexture == "Voltaic_Cyclosword") {
+        newItem.setScale(3.0);
+    } else if (newTexture == "I.E") {
+        newItem.setScale(3.4);
     }
-    
     newItem.formFromCollision = true;
     newItem.setStatic(false); // Allow it to fall
     items.push(newItem); // Store in items array 
