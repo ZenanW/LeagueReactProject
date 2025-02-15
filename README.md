@@ -1,5 +1,7 @@
 # React + Vite
 
+This project is my first full stack project with react.js and node.js.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
