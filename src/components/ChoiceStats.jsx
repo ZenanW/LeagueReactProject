@@ -30,7 +30,7 @@ function ChoiceStats() {
 
   // Fetch community choices from the backend
   useEffect(() => {
-    axios.get('http://localhost:5000/api/abilities/stats')
+    axios.get('http://localhost:5001/api/abilities/stats')
       .then(response => {
         console.log("API Response:", response.data); // Debugging
         
