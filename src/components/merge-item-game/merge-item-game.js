@@ -79,6 +79,7 @@ class GameScene extends Phaser.Scene {
 
     preload() {
         this.load.image("background", "/assets/game-background.png");
+
         this.load.image("long_sword", "/assets/AD_items/Long_Sword-modified.png");
         this.load.image("pickaxe", "/assets/AD_items/Pickaxe-modified.png");
         this.load.image("caulfields_hammer", "/assets/AD_items/Caulfield_s_Warhammer-modified.png");
@@ -93,6 +94,16 @@ class GameScene extends Phaser.Scene {
         this.load.image("jewel", "/assets/AP_items/Blighting_Jewel-modified.png");
         this.load.image("chapter", "/assets/AP_items/Lost_Chapter-modified.png");
         this.load.image("arch_staff", "/assets/AP_items/Archangel_s_Staff-modified.png");
+        this.load.image("gunblade", "/assets/AP_items/Hextech_Gunblade-modified.png");
+
+        this.load.image("cloth_armor", "/assets/Armor_items/Cloth_Armor-modified.png");
+        this.load.image("chain_vest", "/assets/Armor_items/Chain_Vest-modified.png");
+        this.load.image("bramble_vest", "/assets/Armor_items/Bramble_Vest-modified.png");
+        this.load.image("warden_mail", "/assets/Armor_items/Warden_s_Mail-modified.png");
+        this.load.image("frozen_heart", "/assets/Armor_items/Frozen_Heart-modified.png");
+        this.load.image("deadmans", "/assets/Armor_items/Dead_Man_s_Plate-modified.png");
+        this.load.image("thornmail", "/assets/Armor_items/Thornmail-modified.png");
+
     }
 
     create() {
@@ -153,6 +164,20 @@ class GameScene extends Phaser.Scene {
                         this.mergeItems(itemA, itemB, "chapter");
                     } else if (itemA.texture.key === "chapter" && itemB.texture.key === "chapter") {
                         this.mergeItems(itemA, itemB, "staff");
+                    } else if (itemA.texture.key === "staff" && itemB.texture.key === "staff") {
+                        this.mergeItems(itemA, itemB, "gunblade");
+                    } else if (itemA.texture.key === "cloth_armor" && itemB.texture.key === "cloth_armor") {
+                        this.mergeItems(itemA, itemB, "chain_vest");
+                    } else if (itemA.texture.key === "chain_vest" && itemB.texture.key === "chain_vest") {
+                        this.mergeItems(itemA, itemB, "bramble_vest");
+                    } else if (itemA.texture.key === "bramble_vest" && itemB.texture.key === "bramble_vest") {
+                        this.mergeItems(itemA, itemB, "warden_mail");
+                    } else if (itemA.texture.key === "warden_mail" && itemB.texture.key === "warden_mail") {
+                        this.mergeItems(itemA, itemB, "frozen_heart");
+                    } else if (itemA.texture.key === "frozen_heart" && itemB.texture.key === "frozen_heart") {
+                        this.mergeItems(itemA, itemB, "deadmans");
+                    } else if (itemA.texture.key === "deadmans" && itemB.texture.key === "deadmans") {
+                        this.mergeItems(itemA, itemB, "thornmail");
                     }
                 }
             });
@@ -185,6 +210,7 @@ class GameScene extends Phaser.Scene {
         let itemMap = {
             "AD": "long_sword",
             "AP": "tome",
+            "Armor": "cloth_armor"
         };
     
         // Select the correct item based on `selectedItemSet`
@@ -220,7 +246,15 @@ class GameScene extends Phaser.Scene {
             "wand": "wand",
             "jewel": "jewel",
             "chapter": "chapter",
-            "staff": "arch_staff"
+            "staff": "arch_staff",
+            "gunblade": "gunblade",
+            "cloth_armor": "cloth_armor",
+            "chain_vest": "chain_vest",
+            "bramble_vest": "bramble_vest",
+            "warden_mail": "warden_mail",
+            "frozen_heart": "frozen_heart",
+            "deadmans": "deadmans",
+            "thornmail": "thornmail"
         };
 
         if (mergeMap[itemA.texture.key] === itemB.texture.key) {
@@ -251,12 +285,21 @@ class GameScene extends Phaser.Scene {
         };
 
         const apScaling = {
-            "tome": 1.4,
-            "wisp": 1.8,
-            "wand": 2.2,
-            "jewel": 2.6,
-            "chapter": 3.0,
-            "staff": 3.4
+            "wisp": 1.4,
+            "wand": 1.8,
+            "jewel": 2.2,
+            "chapter": 2.6,
+            "staff": 3.0,
+            "gunblade": 3.5
+        };
+
+        const armorScaling = {
+            "chain_vest": 1.6,
+            "bramble_vest": 2.0,
+            "warden_mail": 2.4,
+            "frozen_heart": 2.8,
+            "deadmans": 3.2,
+            "thornmail": 3.6
         };
 
         let scalingFactor = adScaling[newTexture] || apScaling[newTexture] || armorScaling[newTexture] || 1;
