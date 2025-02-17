@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import './ChoiceStats.css';
-
-// Register Chart.js components
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import { HeatMapGrid } from 'react-grid-heatmap'
+import "./ChoiceStats.css";
 
 function ChoiceStats() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Retrieve user's selected abilities from navigation state
+  // Retrieve user's selected abilities
   const userAbilities = location.state?.abilities || {
     Q: { abilityName: "Not Selected", champion: "Unknown Champion" },
     W: { abilityName: "Not Selected", champion: "Unknown Champion" },
@@ -20,106 +16,122 @@ function ChoiceStats() {
     R: { abilityName: "Not Selected", champion: "Unknown Champion" },
   };
 
-  // State to store community ability stats
-  const [communityStats, setCommunityStats] = useState({
-    Q: { ability: "Loading...", champion: "Loading...", frequency: 0 },
-    W: { ability: "Loading...", champion: "Loading...", frequency: 0 },
-    E: { ability: "Loading...", champion: "Loading...", frequency: 0 },
-    R: { ability: "Loading...", champion: "Loading...", frequency: 0 },
-  });
+  // State for heatmap
+  const [heatmapData, setHeatmapData] = useState([]);
+  const [champions, setChampions] = useState([]);
+  const [slots] = useState(["Q", "W", "E", "R"]);
 
-  // Fetch community choices from the backend
   useEffect(() => {
-    axios.get('http://localhost:5001/api/abilities/stats')
+    // Fetch daily champions first
+    axios.get("http://localhost:5001/api/daily-champions")
       .then(response => {
-        console.log("API Response:", response.data); // Debugging
-        
-        if (!response.data.mostChosenAbilities || response.data.mostChosenAbilities.length === 0) {
-          console.warn("No data received from API.");
+        const dailyChampions = response.data.champions;
+        console.log("✅ Daily Champions:", dailyChampions);
+
+        if (!dailyChampions || dailyChampions.length === 0) {
+          console.warn("No daily champions received.");
           return;
         }
 
-        // Convert array to an object for easy access
-        const statsObj = response.data.mostChosenAbilities.reduce((acc, entry) => {
-          acc[entry.slot] = entry;
-          return acc;
-        }, {});
+        // Fetch ability stats next
+        axios.get("http://localhost:5001/api/abilities/stats")
+          .then(res => {
+            console.log("✅ Ability Stats:", res.data);
 
-        setCommunityStats(statsObj);
+            if (!res.data.abilityHeatmap || res.data.abilityHeatmap.length === 0) {
+              console.warn("No heatmap data received.");
+              return;
+            }
+
+            // Map ability stats into an easy lookup format
+            const abilityStats = {};
+            res.data.abilityHeatmap.forEach(entry => {
+              if (!abilityStats[entry.champion]) {
+                abilityStats[entry.champion] = { Q: 0, W: 0, E: 0, R: 0 };
+              }
+              abilityStats[entry.champion][entry.slot] = entry.frequency;
+            });
+
+            // Ensure every daily champion has all four ability slots
+            const championNames = dailyChampions;
+            const matrix = championNames.map(champ =>
+              slots.map(slot => (abilityStats[champ] ? abilityStats[champ][slot] : 0))
+            );
+
+            setChampions(championNames);
+            setHeatmapData(matrix);
+          })
+          .catch(err => console.error("Error fetching ability stats:", err.message));
       })
-      .catch(error => {
-        console.error('Error fetching community abilities:', error.response ? error.response.data : error.message);
-      });
+      .catch(err => console.error("Error fetching daily champions:", err.message));
   }, []);
 
   const goBack = () => {
     navigate('/daily-abilities');
   };
 
-  // Prepare data for the chart
-  const chartData = {
-    labels: ['Q Ability', 'W Ability', 'E Ability', 'R Ability'],
-    datasets: [
-      {
-        label: 'Most Chosen by Community',
-        data: [
-          communityStats.Q.frequency,
-          communityStats.W.frequency,
-          communityStats.E.frequency,
-          communityStats.R.frequency
-        ],
-        backgroundColor: 'rgba(255, 204, 0, 0.7)',
-        borderColor: 'rgba(255, 204, 0, 1)',
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      title: {
-        display: true,
-        text: 'Most Picked Ability per Slot',
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-  };
-
   return (
     <section className="choice-stats-page">
       <div className="stats-container">
-        <h2 className="stats-heading">Your Ability Choices vs. Community</h2>
+        <h2 className="stats-heading">Community Ability Heatmap</h2>
         <p className="stats-description">
-          Compare your ability selections to the most chosen abilities by the community.
+          Compare your ability selections with the most chosen abilities by the community.
         </p>
 
+        {/* User's Ability Selections */}
         <div className="stats-box">
           {["Q", "W", "E", "R"].map((slot) => (
             <div key={slot} className="stat-item">
               <h3>{slot} Ability</h3>
               <p className="stat-value">
-                <strong>Your Pick:</strong> {userAbilities[slot]?.abilityName || "Not Selected"} ({userAbilities[slot]?.champion || "Unknown"})
-              </p>
-              <p className="stat-value">
-                <strong>Most Chosen:</strong> {communityStats[slot]?.ability} ({communityStats[slot]?.champion}) - {communityStats[slot]?.frequency} picks
+                <strong>Your Pick:</strong> <span>{userAbilities[slot]?.abilityName || "Not Selected"}</span> 
+                ({userAbilities[slot]?.champion || "Unknown"})
               </p>
             </div>
           ))}
         </div>
 
-        {/* Bar Chart for Community Stats */}
+        {/* Heatmap */}
         <div className="chart-container">
-          <Bar data={chartData} options={chartOptions} />
+          {/* Heatmap grid */}
+          <div className="heatmap">
+            <HeatMapGrid
+              xLabels={slots}
+              yLabels={champions}
+              data={heatmapData}
+              cellHeight="7rem"
+              cellWidth="7rem"
+              xLabelsPos="top"
+              yLabelsPos="left"
+              yLabelWidth={120}
+              xLabelsStyle={() => ({
+                fontSize: "18px",
+                fontFamily: "Arial, sans-serif",
+                color: "#ffffff",
+              })}
+              yLabelsStyle={() => ({
+                fontSize: "18px",
+                fontFamily: "Arial, sans-serif",
+                color: "#ffffff",
+                textAlign: "right",
+                paddingRight: "10px",
+              })}
+              cellStyle={(_x, _y, ratio) => ({
+                background: `rgba(255, 204, 0, ${ratio})`,
+                fontSize: "1rem",
+                color: `rgba(255, 255, 255, ${ratio > 0.5 ? 1 : 0.8})`,
+                border: "2.5px solid rgb(255, 255, 255)",
+                borderRadius: "0",
+                width: "7rem", 
+                minWidth: "4rem",
+                height: "7rem",
+                minHeight: "4rem",
+              })}
+            />
+          </div>
         </div>
-
+        
+        {/* Back Button */}
         <button className="back-button" onClick={goBack}>Back to Selection</button>
       </div>
     </section>

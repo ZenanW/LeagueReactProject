@@ -83,8 +83,19 @@
   }
 
   .chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
-    max-width: 600px;
+    max-width: 700px; /* Prevents stretching */
     margin: 20px auto;
   }
+
+  .heatmap {
+    display: flex;
+    justify-content: center;
+    min-width: 500px; /* Ensures it doesn't collapse */
+    width: auto !important; /* Forces width to respect content */
+  }
+
   
