@@ -23,7 +23,7 @@ function ChoiceStats() {
 
   useEffect(() => {
     // Fetch daily champions first
-    axios.get("http://localhost:5001/api/daily-champions")
+    axios.get("https://nodebackend-production-cbb7.up.railway.app/api/daily-champions")
       .then(response => {
         const dailyChampions = response.data.champions;
         console.log("✅ Daily Champions:", dailyChampions);
@@ -34,7 +34,7 @@ function ChoiceStats() {
         }
 
         // Fetch ability stats next
-        axios.get("http://localhost:5001/api/abilities/stats")
+        axios.get("https://nodebackend-production-cbb7.up.railway.app/api/abilities/stats")
           .then(res => {
             console.log("✅ Ability Stats:", res.data);
 

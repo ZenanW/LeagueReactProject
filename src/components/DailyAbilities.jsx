@@ -48,7 +48,7 @@ function DailyAbilities() {
     const fetchData = async () => {
       try {
         // 🔹 Fetch 5 champions from your backend
-        const response = await axios.get('http://localhost:5001/api/daily-champions');
+        const response = await axios.get('https://nodebackend-production-cbb7.up.railway.app/api/daily-champions');
         const selectedChampions = response.data.champions; // List of 5 champion names
 
         console.log(`Fetching data for: ${selectedChampions}`);
@@ -77,7 +77,7 @@ function DailyAbilities() {
     console.log("Submitting abilities:", droppedAbilities); // Debug log
 
     try {
-      const response = await axios.post('http://localhost:5001/api/abilities', {
+      const response = await axios.post('https://nodebackend-production-cbb7.up.railway.app/api/abilities', {
         abilities: droppedAbilities 
       });
 
