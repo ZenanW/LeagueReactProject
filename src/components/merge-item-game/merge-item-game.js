@@ -281,7 +281,7 @@ class GameScene extends Phaser.Scene {
             "BF_sword": 2.2,
             "Youmuus_Ghostblade": 2.6,
             "Voltaic_Cyclosword": 3.0,
-            "I.E": 3.4
+            "I.E": 3.8
         };
 
         const apScaling = {
@@ -290,7 +290,7 @@ class GameScene extends Phaser.Scene {
             "jewel": 2.2,
             "chapter": 2.6,
             "staff": 3.0,
-            "gunblade": 3.5
+            "gunblade": 3.8
         };
 
         const armorScaling = {
@@ -299,7 +299,7 @@ class GameScene extends Phaser.Scene {
             "warden_mail": 2.4,
             "frozen_heart": 2.8,
             "deadmans": 3.2,
-            "thornmail": 3.6
+            "thornmail": 3.8
         };
 
         let scalingFactor = adScaling[newTexture] || apScaling[newTexture] || armorScaling[newTexture] || 1;
