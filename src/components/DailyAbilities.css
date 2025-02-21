@@ -129,6 +129,7 @@
 /* Dragging Effects */
 .daily-abilities-page .ability-box {
   cursor: grab;
+  border: 3px solid #1e90ff;
 }
 
 .ability-drop-zone .submit {

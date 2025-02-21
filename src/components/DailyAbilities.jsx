@@ -112,7 +112,7 @@ function DailyAbilities() {
     if (data.slot === slot) {
       setDroppedAbilities((prev) => ({
         ...prev,
-        [slot]: { // ✅ Store the ability as an object containing both the name and champion
+        [slot]: { // Store the ability as an object containing both the name and champion
           abilityName: data.abilityName, 
           champion: data.champion,
           abilityIcon: data.abilityIcon // Optional, if needed for frontend display
@@ -155,6 +155,7 @@ function DailyAbilities() {
                   onDragStart={(event) => handleDragStart(event, champion.abilities[idx], label, champion.championName)}
                 >
                   <img src={champion.abilities[idx].icon} alt={`Ability ${label}`} />
+                  <span className='ability-label'>{label}</span>
                 </div>
               ))}
             </div>
