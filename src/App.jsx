@@ -5,6 +5,7 @@ import './App.css';
 import DailyAbilities from './components/DailyAbilities';
 import ChoiceStats from './components/ChoiceStats';  
 import ItemMiniGame from './components/ItemMiniGame';
+import AIGuessYourMain from './components/AIGuessYourMain';
 
 function App() {
   return (
@@ -17,10 +18,11 @@ function App() {
             <Link to="/">Home</Link>
             <Link to="/daily-abilities">Daily Ability Build</Link>
             <Link to="/item-minigame">Item Mini Game</Link>
+            <Link to="/AIGuess">AI Guess Your Main</Link>
           </nav>
         </header>
 
-        {/* Routes */}
+        {/* Routes */} 
         <Routes>
           {/* Homepage Route */}
           <Route
@@ -43,8 +45,11 @@ function App() {
           {/* Choice Stats Route */}
           <Route path="/daily-abilities/stats" element={<ChoiceStats />} />
 
-          {/* Item Minigame Route*/}
+          {/* Item Minigame Route */}
           <Route path="/item-minigame" element={<ItemMiniGame />} />
+
+          {/* AI guessing your main */}
+          <Route path="/AIGuess" element={<AIGuessYourMain />} />
 
         </Routes>
       </div>

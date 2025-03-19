@@ -1,0 +1,76 @@
+.ai-guess-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: rgba(26, 19, 38, 0.85); /* Slight transparent box look */
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.title {
+    color: #d1a3ff;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: #b5a0e6;
+    margin-bottom: 30px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.chatbox {
+    width: 100%;
+    height: 400px;
+    background: rgba(0, 0, 0, 0.25);
+    overflow-y: auto;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.user-input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
+}
+
+.submit-btn {
+    padding: 10px 20px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background-color: #2563eb;
+}
+
+.guess-area {
+    margin-top: 30px;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+.current-guess {
+    font-size: 1.5rem;
+    color: #00ff90;
+    margin-top: 10px;
+}
+
