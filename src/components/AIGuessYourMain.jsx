@@ -1,11 +1,29 @@
 import "./AIGuessYourMain.css";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function AIGuessYourMain() {
     const [input, setInput] = useState("");
     const [chatHistory, setChatHistory] = useState([]);
     const [currentGuess, setCurrentGuess] = useState("None yet...");
+
+    useEffect(() => {
+        const startChat = async () => {
+            try {
+                const response = await axios.post("http://localhost:5001/api/ai-guess/ask", {
+                    question: "", 
+                    previousContext: ""
+                });
+    
+                setChatHistory([{ sender: "ai", message: response.data.aiReply }]);
+            } catch (err) {
+                console.error("Error during initial AI message:", err);
+                setChatHistory([{ sender: "ai", message: "Oops! I couldn't load. Try refreshing." }]);
+            }
+        };
+    
+        startChat();
+    }, []);
 
     const handleSend = async () => {
         if (!input.trim()) return;
@@ -14,7 +32,7 @@ function AIGuessYourMain() {
         setChatHistory((prev) => [...prev, { sender: "user", message: input }]);
 
         try {
-            const response = await axios.post("My_Railway_API", {
+            const response = await axios.post("http://localhost:5001/api/ai-guess/ask", {
                 question: input,
                 previousContext: chatHistory.map((msg) => `${msg.sender}: ${msg.message}`).join("\n"),
             });
@@ -23,9 +41,8 @@ function AIGuessYourMain() {
             setChatHistory((prev) => [...prev, { sender: "ai", message: response.data.aiReply }]);
 
             // Optionally update current guess if the AI mentions one
-            if (response.data.aiReply.toLowerCase().includes("i think your champion is")) {
-                const guess = response.data.aiReply.split("I think your champion is")[1].split(".")[0].trim();
-                setCurrentGuess(guess);
+            if (response.data.currentGuess) {
+                setCurrentGuess(response.data.currentGuess);
             }
         } catch (err) {
             console.error("Error communicating with AI:", err);
