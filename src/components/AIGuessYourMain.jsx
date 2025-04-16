@@ -10,7 +10,7 @@ function AIGuessYourMain() {
     useEffect(() => {
         const startChat = async () => {
             try {
-                const response = await axios.post("http://localhost:5001/api/ai-guess/ask", {
+                const response = await axios.post("https://nodebackend-production-cbb7.up.railway.app/api/ai-guess/ask", {
                     question: "", 
                     previousContext: ""
                 });
@@ -32,7 +32,7 @@ function AIGuessYourMain() {
         setChatHistory((prev) => [...prev, { sender: "user", message: input }]);
 
         try {
-            const response = await axios.post("http://localhost:5001/api/ai-guess/ask", {
+            const response = await axios.post("https://nodebackend-production-cbb7.up.railway.app/api/ai-guess/ask", {
                 question: input,
                 previousContext: chatHistory.map((msg) => `${msg.sender}: ${msg.message}`).join("\n"),
             });
