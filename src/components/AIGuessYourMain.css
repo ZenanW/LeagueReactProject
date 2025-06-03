@@ -74,3 +74,26 @@
     margin-top: 10px;
 }
 
+.loading-message {
+    color: #b5a0e6;
+    font-style: italic;
+    padding: 0.5rem 1rem;
+    font-size: 1.3rem;
+}
+
+.loading-message .dot {
+    animation: blink 1.5s infinite;
+    animation-delay: calc(var(--i) * 0.2s);
+    opacity: 0;
+}
+
+.loading-message .dot:nth-child(1) { --i: 1; }
+.loading-message .dot:nth-child(2) { --i: 2; }
+.loading-message .dot:nth-child(3) { --i: 3; }
+
+@keyframes blink {
+    0%, 20% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
